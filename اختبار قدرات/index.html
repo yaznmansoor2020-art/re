@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>نظام اختبار - محلي متقدّم</title>
+<style>
+:root{
+  --bg:#07121a; --card:#0b1720; --accent:#06b6d4; --muted:#98a8b3; --danger:#ef4444; --ok:#16a34a;
+}
+*{box-sizing:border-box;font-family: "Segoe UI", Tahoma, Arial; }
+body{margin:0;background:linear-gradient(180deg,#05121a,#071722);color:#e6f2f5}
+.container{max-width:1100px;margin:18px auto;padding:14px}
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.title{font-size:20px;font-weight:700}
+.small{color:var(--muted);font-size:13px}
+.center{text-align:center}
+.row{display:flex;gap:10px;align-items:center}
+input, button, select, textarea {font-size:15px}
+input[type="text"], input[type="number"], input[type="password"]{
+  padding:10px;border-radius:8px;border:1px solid #123;background:#061018;color:#e6f2f5;width:260px
+}
+button{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#012;font-weight:700;cursor:pointer}
+button.secondary{background:#22333a;color:#dff6f5}
+.hidden{display:none}
+.exam-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.badge{background:#061e1c;padding:8px 12px;border-radius:10px;color:var(--accent);font-weight:700}
+.timer{font-weight:800;color:#ffb86b}
+.qbox{background:linear-gradient(180deg,#071a22,#06141a);padding:18px;border-radius:10px;border:1px solid #0f2b33}
+.qnum{font-weight:700;color:#9fe8e0;margin-bottom:6px}
+.qtext{font-size:20px;margin-bottom:12px}
+.options{display:grid;gap:10px}
+.opt{background:#071a24;padding:12px;border-radius:8px;border:1px solid #0f2b33;color:#dff6f5;cursor:pointer;transition:all .12s}
+.opt:hover{transform:translateY(-2px)}
+.opt.selected{background:var(--accent);color:#012;font-weight:700}
+.controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px}
+.left-controls{display:flex;gap:10px}
+.btn-danger{background:var(--danger);color:#fff}
+.rules{margin-top:12px;padding:12px;background:#071720;border-radius:8px;color:var(--muted);font-size:14px}
+.review-badge{position:absolute;right:20px;top:16px;background:#062226;padding:6px 8px;border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer}
+.review-icon{background:#082b31;border-radius:6px;padding:6px;color:#9fe8e0;border:1px solid #023}
+.progress{color:var(--muted)}
+.teacher-panel{display:none;margin-top:12px}
+.results-list{max-height:360px;overflow:auto;padding:10px;background:#061116;border-radius:8px;border:1px solid #123;margin-top:10px}
+.result-row{padding:8px;border-bottom:1px dashed #0f2b33}
+footer{margin-top:16px;text-align:center;color:#6f8a93;font-size:13px}
+@media(max-width:820px){.container{padding:8px}.header{flex-direction:column;gap:8px}.exam-top{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body oncontextmenu="return false" onselectstart="return false">
+
+<div class="container">
+  <!-- شاشة التسجيل / البداية -->
+  <div class="card" id="startCard">
+    <div class="header">
+      <div>
+        <div class="title">نظام الاختبار المحلي (نسخة متقدّمة)</div>
+        <div class="small">ادخل اسم الطالب ورقمه مرة واحدة — لا يمكن تغييره لاحقاً</div>
+      </div>
+      <div class="small">كلمة مرور المعلم مخفية (للمدير فقط)</div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="studentName" placeholder="اسم الطالب (اكتب اسمك)" />
+      <input type="number" id="studentNumber" placeholder="رقم الطالب (من أوراقك)" />
+      <button id="startBtn">بدء الاختبار</button>
+      <button id="teacherEnter" class="secondary">دخول المعلم</button>
+    </div>
+
+    <div class="rules" style="margin-top:14px">
+      <strong>قوانين الاختبار:</strong>
+      <ul style="margin:8px 0 0 16px;padding:0">
+        <li>كل قسم مدته 24:00 دقيقة ويحتوي 5 أسئلة.</li>
+        <li>لا يمكن للطالب تغيير اسمه أو رقمه بعد البدء.</li>
+        <li>الطالب لا يرى نتيجته؛ النتائج متاحة للمعلم فقط بكلمة السر.</li>
+        <li>لا يمكن إنهاء الاختبار نهائياً قبل انتهاء جميع الأقسام (يمكن إنهاء القسم والانتظار حتى انتهاء وقته).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- واجهة الاختبار -->
+  <div class="card hidden" id="examCard">
+    <div class="exam-top">
+      <div class="badge" id="studentBadge">الطالب: -</div>
+      <div class="timer" id="timerDisplay">24:00</div>
+    </div>
+
+    <div style="position:relative">
+      <div class="review-badge" id="bookmarkToggle" title="عليم/الغاء علامة للمراجعة">
+        <span class="review-icon" id="bookmarkIcon">☆</span> علامة للمراجعة
+      </div>
+      <div class="qbox" id="qbox">
+        <!-- السؤال يظهر هنا -->
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="left-controls">
+        <button id="prevBtn" class="secondary">السابق</button>
+        <button id="nextBtn">التالي</button>
+        <button id="endSectionBtn" class="secondary btn-danger">إنهاء القسم</button>
+      </div>
+      <div class="progress" id="progressText">القسم 1 من 2 — سؤال 1 من 5</div>
+    </div>
+
+    <div class="rules" id="rulesBox" style="margin-top:14px">
+      <strong>ملاحظة:</strong> يمكنك تعليم أي سؤال للمراجعة بالضغط على أيقونة "علامة للمراجعة" أعلى يمين السؤال. بعد إنهاء القسم ستعرض شاشة مراجعة تحتوي على الأسئلة المكتملة وغير المكتملة والمعلمة.
+    </div>
+  </div>
+
+  <!-- شاشة المراجعة داخل القسم -->
+  <div class="card hidden" id="reviewCard">
+    <h3 class="center">مراجعة القسم</h3>
+    <p class="small center" id="reviewNote"></p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+      <div style="min-width:260px" class="card">
+        <strong>مكتملة</strong>
+        <div id="completedList" style="margin-top:8px"></div>
+      </div>
+      <div style="min-width:260px" class="card">
+        <strong>غير مكتملة</strong>
+        <div id="incompleteList" style="margin-top:8px"></div>
+      </div>
+      <div style="min-width:260px" class="card">
+        <strong>معلمة للمراجعة</strong>
+        <div id="markedList" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px">
+      <button id="proceedBtn">متابعة (انتظر انتهاء وقت القسم للمباشرة إن لزم)</button>
+    </div>
+  </div>
+
+  <!-- شاشة الإنهاء -->
+  <div class="card hidden" id="finishCard">
+    <h2 class="center">شكراً لإكمال الاختبار</h2>
+    <p class="small center">انتهت جميع الأقسام. سيتم حفظ بيانات الاختبار للمعلم.</p>
+  </div>
+
+  <!-- لوحة المعلم (مخفية) -->
+  <div class="card teacher-panel" id="teacherLoginCard">
+    <h3>دخول المعلم</h3>
+    <div style="margin-top:8px">
+      <input type="password" id="teacherPass" placeholder="كلمة سر المعلم" />
+      <button id="teacherLoginBtn">دخول</button>
+      <span class="small" style="margin-left:12px;color:var(--muted)">كلمة السر: 101010</span>
+    </div>
+    <div id="teacherMsg" style="color:var(--danger);margin-top:8px"></div>
+  </div>
+
+  <div class="card teacher-panel" id="teacherPanelCard">
+    <h3>لوحة نتائج الطلاب</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+      <button id="exportBtn" class="secondary">تصدير JSON</button>
+      <button id="clearBtn" class="secondary">مسح النتائج</button>
+    </div>
+    <div class="results-list" id="resultsList"></div>
+  </div>
+
+  <footer>نظام اختبار محلي — مطوّر حسب الطلب</footer>
+</div>
+
+<script>
+/* ============================
+   إعداد البيانات (2 قسم × 5 أسئلة)
+   يمكنك تعديل الأسئلة / الأقسام بسهولة داخل thisSections
+   ============================ */
+const thisSections = [
+  [
+    {q:"السعر : البحر", options:["البحر : اليم","الماء : السمك","الطفل : الرجل","القلم : المسطرة"], correct:0},
+    {q:"قلب : جسد", options:["ماكينة : سيارة","يسر : عسر","أسود : أبيض","صيف : شتاء"], correct:0},
+    {q:"أفراح : أحزان", options:["ليل : نهار","يسر : عسر","أسود : أبيض","صيف : شتاء"], correct:1},
+    {q:"دفء : نار", options:["ري : ماء","خوف : فقر","شتاء : ثلج","مروحة : برودة"], correct:0},
+    {q:"ليل : دجى", options:["غروب : أصيل","فجر : ضحى","صبح : غسق","محيط : نهر"], correct:1}
+  ],
+  [
+    {q:"فجر : نور", options:["أصيل : نور","نهار : دجى","نهار : عمل","غسق : ظلام"], correct:0},
+    {q:"جبريل : اسرائيل", options:["هاروت : ماروت","نوح : هود","اسرافيل : أيوب","يونس : ذا النون"], correct:0},
+    {q:"رمضان : ذو الحجة", options:["المغرب : العصر","فرض : واجب","الإثنين : الخميس","صوم : زكاة"], correct:2},
+    {q:"سرب : طير", options:["قبيلة : رجل","جماعة : قوم","إصبع : يد","شبل : أسد"], correct:1},
+    {q:"عين : لون", options:["أذن : سمع","أنف : رائحة","لسان : تذوق","يد : قوة"], correct:0}
+  ]
+];
+
+const SECTION_DURATION_MIN = 24; // دقائق
+const TEACHER_PASSWORD = "101010";
+
+let studentName = "";
+let studentNumber = "";
+let currentSection = 0;
+let currentIndex = 0;
+let selections = [];       // selections[section][index] = choiceIndex or -1
+let marks = [];            // marks[section][index] = true/false
+let sectionTimeLeft = SECTION_DURATION_MIN * 60;
+let sectionTimer = null;
+let sectionLocked = [];    // sectionLocked[s] = true if section finished (no return)
+
+/* DOM */
+const startCard = document.getElementById("startCard");
+const examCard = document.getElementById("examCard");
+const reviewCard = document.getElementById("reviewCard");
+const finishCard = document.getElementById("finishCard");
+const teacherLoginCard = document.getElementById("teacherLoginCard");
+const teacherPanelCard = document.getElementById("teacherPanelCard");
+
+const studentNameInput = document.getElementById("studentName");
+const studentNumberInput = document.getElementById("studentNumber");
+const startBtn = document.getElementById("startBtn");
+const teacherEnter = document.getElementById("teacherEnter");
+
+const studentBadge = document.getElementById("studentBadge");
+const timerDisplay = document.getElementById("timerDisplay");
+const qbox = document.getElementById("qbox");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const endSectionBtn = document.getElementById("endSectionBtn");
+const progressText = document.getElementById("progressText");
+const bookmarkToggle = document.getElementById("bookmarkToggle");
+const bookmarkIcon = document.getElementById("bookmarkIcon");
+
+const completedList = document.getElementById("completedList");
+const incompleteList = document.getElementById("incompleteList");
+const markedList = document.getElementById("markedList");
+const reviewNote = document.getElementById("reviewNote");
+const proceedBtn = document.getElementById("proceedBtn");
+
+/* teacher */
+const teacherPass = document.getElementById("teacherPass");
+const teacherLoginBtn = document.getElementById("teacherLoginBtn");
+const teacherMsg = document.getElementById("teacherMsg");
+const resultsList = document.getElementById("resultsList");
+const exportBtn = document.getElementById("exportBtn");
+const clearBtn = document.getElementById("clearBtn");
+const teacherEnterBtn = document.getElementById("teacherEnter");
+
+/* ============================
+   Initialization
+   ============================ */
+function initArrays(){
+  selections = thisSections.map(section => section.map(()=> -1));
+  marks = thisSections.map(section => section.map(()=> false));
+  sectionLocked = thisSections.map(()=> false);
+}
+initArrays();
+
+/* ============================
+   Start exam
+   ============================ */
+startBtn.addEventListener("click", ()=>{
+  const name = studentNameInput.value.trim();
+  const num = studentNumberInput.value.trim();
+  if(!name || !num){ alert("أدخل اسم ورقم الطالب"); return; }
+  studentName = name; studentNumber = num;
+  // lock inputs
+  studentNameInput.disabled = true;
+  studentNumberInput.disabled = true;
+  startBtn.disabled = true;
+  teacherEnter.classList.add("hidden"); // hide teacher button from student
+  // show exam
+  startCard.classList.add("hidden");
+  examCard.classList.remove("hidden");
+  studentBadge.textContent = `${studentName} — ${studentNumber}`;
+  currentSection = 0; currentIndex = 0;
+  sectionTimeLeft = SECTION_DURATION_MIN*60;
+  renderQuestion();
+  startSectionTimer();
+});
+
+/* ============================
+   Render question
+   ============================ */
+function renderQuestion(){
+  const section = thisSections[currentSection];
+  const item = section[currentIndex];
+  const sel = selections[currentSection][currentIndex];
+  const marked = marks[currentSection][currentIndex];
+
+  progressText.textContent = `القسم ${currentSection+1} من ${thisSections.length} — سؤال ${currentIndex+1} من ${section.length}`;
+  timerDisplay.textContent = formatTime(sectionTimeLeft);
+
+  // update bookmark icon
+  bookmarkIcon.textContent = marked ? "★" : "☆";
+
+  let html = `<div class="qnum">السؤال ${currentIndex+1}</div>`;
+  html += `<div class="qtext">${item.q}</div>`;
+  html += `<div class="options">`;
+  item.options.forEach((opt, i)=>{
+    const selClass = (i === sel) ? "opt selected" : "opt";
+    html += `<div class="${selClass}" onclick="chooseOption(${i})" id="opt_${i}">${opt}</div>`;
+  });
+  html += `</div>`;
+  qbox.innerHTML = html;
+
+  prevBtn.disabled = currentIndex === 0 || sectionLocked[currentSection];
+  nextBtn.disabled = sectionLocked[currentSection];
+  endSectionBtn.disabled = sectionLocked[currentSection];
+}
+
+/* ============================
+   choose option
+   ============================ */
+function chooseOption(i){
+  if(sectionLocked[currentSection]) return;
+  selections[currentSection][currentIndex] = i;
+  for(let k=0;k<thisSections[currentSection].length;k++){
+    const el = document.getElementById("opt_"+k);
+    if(el) el.classList.toggle("selected", k===i);
+  }
+}
+
+/* ============================
+   Bookmark toggle
+   ============================ */
+bookmarkToggle.addEventListener("click", ()=>{
+  marks[currentSection][currentIndex] = !marks[currentSection][currentIndex];
+  bookmarkIcon.textContent = marks[currentSection][currentIndex] ? "★" : "☆";
+  // update markedList when in review
+});
+
+/* ============================
+   Previous / Next handlers
+   ============================ */
+prevBtn.addEventListener("click", ()=>{
+  if(currentIndex>0 && !sectionLocked[currentSection]){
+    currentIndex--;
+    renderQuestion();
+  }
+});
+
+nextBtn.addEventListener("click", ()=>{
+  if(sectionLocked[currentSection]) return;
+  if(selections[currentSection][currentIndex] === -1){
+    alert("الرجاء اختيار إجابة قبل الانتقال");
+    return;
+  }
+  // if last question -> go to review for this section
+  if(currentIndex === thisSections[currentSection].length - 1){
+    openReview("لقد أنكملت الأسئلة، هذه صفحة المراجعة للقسم.");
+    return;
+  }
+  currentIndex++;
+  renderQuestion();
+});
+
+/* ============================
+   End section (student-initiated)
+   ============================ */
+endSectionBtn.addEventListener("click", ()=>{
+  if(!confirm("هل تريد إنهاء هذا القسم الآن؟ لن تتمكن من الرجوع إليه بعد الانتقال.")) return;
+  openReview("أنهيت القسم. هنا صفحة المراجعة. عند الضغط متابعة، سيتم الانتقال بعد انتهاء وقت القسم أو فوراً إذا انتهى الوقت.");
+});
+
+/* ============================
+   Open review page
+   ============================ */
+function openReview(note){
+  // lock UI for this section from answering further until proceed/timeout or section end
+  // but we allow marking/inspect in review
+  renderReviewLists();
+  reviewNote.textContent = note;
+  examCard.classList.add("hidden");
+  reviewCard.classList.remove("hidden");
+  // disable direct question interaction by marking sectionLocked only on proceed or when time ends and we finalize
+}
+
+/* ============================
+   render review lists
+   ============================ */
+function renderReviewLists(){
+  const section = thisSections[currentSection];
+  let comp = [], incomp = [], marked = [];
+  section.forEach((q,i)=>{
+    const label = `السؤال ${i+1}: ${q.q}`;
+    if(selections[currentSection][i] !== -1) comp.push({i,label});
+    else incomp.push({i,label});
+    if(marks[currentSection][i]) marked.push({i,label});
+  });
+  completedList.innerHTML = comp.length ? comp.map(x=>`<div>${x.label}</div>`).join("") : "<div class='small'>لا توجد أسئلة مكتملة</div>";
+  incompleteList.innerHTML = incomp.length ? incomp.map(x=>`<div>${x.label}</div>`).join("") : "<div class='small'>لا توجد أسئلة غير مكتملة</div>";
+  markedList.innerHTML = marked.length ? marked.map(x=>`<div>${x.label}</div>`).join("") : "<div class='small'>لا توجد أسئلة معلّمة</div>";
+}
+
+/* ============================
+   proceed from review -> next section or wait until time ends
+   ============================ */
+proceedBtn.addEventListener("click", ()=>{
+  // if sectionTimeLeft > 0 => wait until time ends (show waiting)
+  if(sectionTimeLeft > 0){
+    reviewNote.textContent = `الرجاء الانتظار حتى انتهاء وقت القسم — المتبقي: ${formatTime(sectionTimeLeft)}`;
+    // show waiting timer and prevent jumping; when timer hits 0, auto-call finalizeSection()
+    // continue the existing timer; nothing else to do
+  } else {
+    finalizeSection();
+  }
+});
+
+/* ============================
+   finalize section: lock it, save partial if needed, move to next section
+   ============================ */
+function finalizeSection(){
+  // lock the section (no return)
+  sectionLocked[currentSection] = true;
+  // stop timer if still running
+  if(sectionTimer) { clearInterval(sectionTimer); sectionTimer = null; }
+  // save partial (we only save final at endExam)
+  // move to next section or finish
+  currentSection++;
+  if(currentSection >= thisSections.length){
+    // finish entire exam
+    reviewCard.classList.add("hidden");
+    finishExam();
+    return;
+  }
+  // else proceed to next section
+  reviewCard.classList.add("hidden");
+  examCard.classList.remove("hidden");
+  currentIndex = 0;
+  sectionTimeLeft = SECTION_DURATION_MIN * 60;
+  renderQuestion();
+  startSectionTimer();
+}
+
+/* ============================
+   Timer logic for each section
+   ============================ */
+function startSectionTimer(){
+  // ensure any existing cleared
+  if(sectionTimer) clearInterval(sectionTimer);
+  timerDisplay.textContent = formatTime(sectionTimeLeft);
+  sectionTimer = setInterval(()=>{
+    sectionTimeLeft--;
+    timerDisplay.textContent = formatTime(sectionTimeLeft);
+    if(sectionTimeLeft <= 0){
+      clearInterval(sectionTimer);
+      sectionTimer = null;
+      // lock section and auto-open review and auto-finalize
+      // But per spec: when time ends, we should move to next section automatically
+      // show short alert then finalize
+      alert("انتهى وقت هذا القسم. سيتم الانتقال للقسم التالي.");
+      // finalize immediately
+      // first show review briefly? we will finalize directly to next section but still save partials
+      // save partial (no UI)
+      sectionLocked[currentSection] = true;
+      // if last section -> finish exam
+      currentSection++;
+      if(currentSection >= thisSections.length){
+        examCard.classList.add("hidden");
+        finishExam();
+        return;
+      } else {
+        // start next section automatically
+        sectionTimeLeft = SECTION_DURATION_MIN*60;
+        currentIndex = 0;
+        renderQuestion();
+        startSectionTimer();
+      }
+    }
+  },1000);
+}
+
+/* ============================
+   finish entire exam
+   ============================ */
+function finishExam(){
+  // save record
+  const results = JSON.parse(localStorage.getItem("nimer_results") || "[]");
+  // compute scores per section
+  const scores = thisSections.map((section, sidx) => {
+    let sc = 0;
+    section.forEach((q, qidx)=>{
+      if(selections[sidx][qidx] === q.correct) sc++;
+    });
+    return sc;
+  });
+  const record = { name: studentName, id: studentNumber, date: new Date().toLocaleString(), selections, marks, scores };
+  results.push(record);
+  localStorage.setItem("nimer_results", JSON.stringify(results));
+  // hide exam / review and show finishCard
+  examCard.classList.add("hidden");
+  reviewCard.classList.add("hidden");
+  finishCard.classList.remove("hidden");
+}
+
+/* ============================
+   format time helper
+   ============================ */
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = (sec%60).toString().padStart(2,"0");
+  return `${m}:${s}`;
+}
+
+/* ============================
+   Teacher flow
+   ============================ */
+teacherEnter.addEventListener("click", ()=>{
+  // show teacher login panel (for admin access)
+  startCard.classList.add("hidden");
+  teacherLoginCard.classList.remove("hidden");
+});
+teacherLoginBtn.addEventListener("click", ()=>{
+  const v = teacherPass.value.trim();
+  if(v === TEACHER_PASSWORD){
+    teacherLoginCard.classList.add("hidden");
+    teacherPanelCard.classList.remove("hidden");
+    renderTeacherResults();
+  } else {
+    teacherMsg.textContent = "كلمة المرور خاطئة";
+    setTimeout(()=> teacherMsg.textContent = "", 3000);
+  }
+});
+function renderTeacherResults(){
+  const results = JSON.parse(localStorage.getItem("nimer_results") || "[]");
+  if(results.length === 0){
+    resultsList.innerHTML = "<div class='small'>لا توجد نتائج حالياً</div>";
+    return;
+  }
+  let html = "";
+  results.slice().reverse().forEach(rec=>{
+    html += `<div class="result-row"><strong>الطالب:</strong> ${rec.name} — <strong>رقم:</strong> ${rec.id} — <strong>التاريخ:</strong> ${rec.date}<br>
+      <strong>الدرجات:</strong> ${rec.scores.join(" | ")}<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--muted)">تفاصيل الإجابات</summary>
+      <pre style="white-space:pre-wrap;background:#061316;color:#cfeef7;padding:8px;border-radius:6px">${JSON.stringify(rec, null, 2)}</pre></details></div>`;
+  });
+  resultsList.innerHTML = html;
+}
+exportBtn.addEventListener("click", ()=>{
+  const data = localStorage.getItem("nimer_results") || "[]";
+  const blob = new Blob([data], {type: "application/json;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "nimer_results.json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+clearBtn.addEventListener("click", ()=>{
+  if(!confirm("هل تريد مسح كل النتائج؟")) return;
+  localStorage.removeItem("nimer_results");
+  renderTeacherResults();
+});
+
+/* ============================
+   Keyboard / protection
+   ============================ */
+document.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey && e.key.toLowerCase() === 'u') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='i') || e.key === 'F12'){
+    e.preventDefault();
+  }
+});
+
+/* ============================
+   Support ?teacher param to open teacher login
+   ============================ */
+(function(){
+  if(location.search.includes("teacher")){
+    startCard.classList.add("hidden");
+    teacherLoginCard.classList.remove("hidden");
+  }
+})();
+
+/* ============================
+   Initialize render (disable exam until start)
+   ============================ */
+renderQuestion(); // safe initial call
+
+</script>
+</body>
+</html>
