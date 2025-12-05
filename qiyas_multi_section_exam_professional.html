@@ -1,0 +1,1169 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>اختبار القدرات المحوسب - محاكاة متعددة الأقسام (احترافية)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Tahoma", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #e0f7fa 0, #e3f2fd 40%, #eceff1 100%);
+      direction: rtl;
+    }
+    header {
+      background: linear-gradient(90deg,#006064,#0097a7);
+      color: #fff;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    header .left-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: normal;
+      letter-spacing: .3px;
+    }
+    .teacher-btn {
+      background: #ffd54f;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      color: #263238;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    main {
+      max-width: 1150px;
+      margin: 26px auto 30px;
+      padding: 0 10px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+      padding: 18px 22px;
+      margin-bottom: 16px;
+      border: 1px solid #dde3ea;
+    }
+    .card-title {
+      font-size: 16px;
+      margin: 0 0 8px 0;
+      color: #004d60;
+      font-weight: bold;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    label {
+      font-size: 13px;
+      color: #37474f;
+    }
+    input[type="text"] {
+      padding: 7px 10px;
+      border-radius: 4px;
+      border: 1px solid #cfd8dc;
+      font-size: 14px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #0097a7;
+      box-shadow: 0 0 0 2px rgba(0,151,167,0.15);
+    }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-primary {
+      background: #006064;
+      color: #fff;
+      min-width: 140px;
+    }
+    .btn-secondary {
+      background: #eceff1;
+      color: #263238;
+    }
+    .btn-danger {
+      background: #c62828;
+      color: #fff;
+    }
+    .center { text-align: center; }
+    .hidden { display: none; }
+    .small-text {
+      font-size: 12px;
+      color: #607d8b;
+    }
+    .mt-10 { margin-top: 10px; }
+    .mt-15 { margin-top: 15px; }
+    .mt-20 { margin-top: 20px; }
+
+    /* واجهة معلومات الطالب - شبيه قياس */
+    .intro-card {
+      max-width: 900px;
+      margin: 0 auto 18px;
+      padding: 0;
+      overflow: hidden;
+    }
+    .intro-header-bar {
+      background: linear-gradient(90deg,#004d60,#018a96);
+      color: #e0f7fa;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #00434f;
+    }
+    .intro-header-title {
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .intro-header-meta {
+      font-size: 12px;
+      opacity: .9;
+    }
+    .intro-body {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.1fr) minmax(280px, 1.2fr);
+      gap: 0;
+    }
+    .intro-infos {
+      border-left: 1px solid #eceff1;
+      padding: 14px 18px 16px;
+      background: #fafbfc;
+    }
+    .intro-student {
+      padding: 14px 18px 16px;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      font-size: 12px;
+      color: #455a64;
+      margin-bottom: 8px;
+    }
+    .meta-label {
+      font-weight: bold;
+      color: #004d60;
+    }
+    .rules-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #004d60;
+      margin: 4px 0 6px;
+    }
+    .rules-list {
+      margin: 0;
+      padding-right: 18px;
+      font-size: 12px;
+      color: #455a64;
+    }
+    .rules-list li {
+      margin-bottom: 3px;
+    }
+    .intro-note {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #fff8e1;
+      border-radius: 6px;
+      border: 1px dashed #ffca28;
+      font-size: 11px;
+      color: #8d6e00;
+    }
+    .student-fields-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #004d60;
+      margin-bottom: 8px;
+    }
+    .student-fields-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .start-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #78909c;
+    }
+
+    @media (max-width: 800px) {
+      .intro-body {
+        grid-template-columns: 1fr;
+      }
+      .intro-infos {
+        border-left: none;
+        border-bottom: 1px solid #eceff1;
+      }
+    }
+
+    /* Exam layout similar to Qiyas screen */
+    .exam-frame {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px;
+    }
+    .exam-sidebar {
+      background: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .exam-main {
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      padding: 14px 16px;
+    }
+    .sidebar-box {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .sidebar-label {
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #006064;
+      font-size: 12px;
+    }
+    .timer-display {
+      font-size: 16px;
+      font-weight: bold;
+      color: #b71c1c;
+    }
+    .section-indicator {
+      font-size: 13px;
+      color: #37474f;
+      margin-top: 4px;
+    }
+    .legend {
+      font-size: 11px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      border: 1px solid #b0bec5;
+      margin-left: 5px;
+    }
+    .legend-unanswered { background: #ffffff; }
+    .legend-answered { background: #c8e6c9; }
+    .legend-review { background: #ffe0b2; }
+
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .q-cell {
+      border-radius: 4px;
+      padding: 4px 0;
+      font-size: 12px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #cfd8dc;
+      background: #ffffff;
+    }
+    .q-cell.answered {
+      background: #c8e6c9;
+      border-color: #81c784;
+    }
+    .q-cell.review {
+      background: #ffe0b2;
+      border-color: #ffb74d;
+    }
+    .q-cell.active {
+      outline: 2px solid #1e88e5;
+    }
+    .sidebar-bottom-btn {
+      margin-top: 8px;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .exam-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: #37474f;
+    }
+    .question-num-label {
+      font-weight: bold;
+      color: #006064;
+    }
+    .section-title-label {
+      font-weight: bold;
+      color: #006064;
+    }
+    .question-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 16px;
+      margin-top: 6px;
+      background: #fafafa;
+      min-height: 190px;
+      font-size: 20px;
+      line-height: 1.7;
+    }
+    .options-list {
+      list-style: none;
+      margin: 12px 0 0 0;
+      padding: 0;
+    }
+    .options-list li { margin-bottom: 7px; }
+    .option-btn {
+      width: 100%;
+      text-align: right;
+      padding: 10px 12px;
+      border-radius: 4px;
+      border: 1px solid #cfd8dc;
+      background: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .option-btn.selected {
+      background: #e3f2fd;
+      border-color: #1e88e5;
+    }
+
+    .exam-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .exam-footer-left,
+    .exam-footer-right {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .nav-btn {
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid #cfd8dc;
+      background: #eceff1;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .review-toggle {
+      background: #fff3e0;
+      border: 1px solid #ffb74d;
+      color: #e65100;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .review-toggle.active {
+      background: #ffe0b2;
+      font-weight: bold;
+    }
+    .finish-section-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: none;
+      background: #c62828;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Review table */
+    table.review-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .review-table th,
+    .review-table td {
+      border: 1px solid #e0e0e0;
+      padding: 5px 6px;
+      text-align: center;
+    }
+    .review-table th {
+      background: #f5f5f5;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    .badge-unanswered { background:#ffcdd2; color:#b71c1c; }
+    .badge-answered { background:#c8e6c9; color:#1b5e20; }
+    .badge-review { background:#ffe0b2; color:#e65100; }
+
+    table.teacher-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .teacher-table th,
+    .teacher-table td {
+      border: 1px solid #e0e0e0;
+      padding: 5px 6px;
+      text-align: center;
+    }
+    .teacher-table th {
+      background: #f5f5f5;
+    }
+
+    @media (max-width: 850px) {
+      .exam-frame {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="left-controls">
+    <button class="teacher-btn" id="teacherBtn">زر المعلم</button>
+  </div>
+  <h1>اختبار القدرات المحوسب - نموذج محاكاة</h1>
+</header>
+
+<main>
+  <!-- شاشة بيانات الطالب والقوانين (واجهة شبيهة بقياس) -->
+  <section id="introView" class="card intro-card">
+    <div class="intro-header-bar">
+      <div class="intro-header-title">نموذج محاكاة اختبار القدرات العامة (محوسب)</div>
+      <div class="intro-header-meta">
+        نوع الاختبار: تجريبي &nbsp; | &nbsp; اللغة: العربية
+      </div>
+    </div>
+    <div class="intro-body">
+      <!-- الجهة اليسرى: معلومات الاختبار والقوانين -->
+      <div class="intro-infos">
+        <div class="meta-row">
+          <div><span class="meta-label">المركز:</span> المركز الوطني للقياس (محاكاة تدريبية)</div>
+        </div>
+        <div class="meta-row">
+          <div><span class="meta-label">أقسام الاختبار:</span> 3 أقسام متتالية</div>
+          <div><span class="meta-label">زمن كل قسم:</span> 15 دقيقة</div>
+        </div>
+        <div class="meta-row">
+          <div><span class="meta-label">عدد الأسئلة في القسم:</span> 14 سؤال (7 كمي + 7 لفظي)</div>
+          <div><span class="meta-label">إجمالي الأسئلة:</span> 42 سؤالاً</div>
+        </div>
+        <div class="rules-title">تعليمات هامة:</div>
+        <ul class="rules-list">
+          <li>اقرأ السؤال جيداً قبل اختيار الإجابة.</li>
+          <li>يمكنك تغيير إجابتك ما دام زمن القسم مستمراً ولم يتم إنهاؤه.</li>
+          <li>يمكن وضع علامة للمراجعة ثم العودة للسؤال من لوحة الأسئلة.</li>
+          <li>لا يمكن الرجوع إلى قسم تم إنهاؤه أو انتهى زمنه.</li>
+          <li>نتيجة هذا النموذج لا تُعد درجة رسمية، وهي لأغراض التدريب فقط.</li>
+        </ul>
+        <div class="intro-note">
+          ملاحظة: عند إنهاء القسم مبكراً، يمكنك استخدام شاشة المراجعة حتى انتهاء الزمن،
+          ثم سيتم نقلك تلقائياً إلى القسم التالي عند انتهاء الوقت.
+        </div>
+      </div>
+
+      <!-- الجهة اليمنى: بيانات الطالب -->
+      <div class="intro-student">
+        <div class="student-fields-title">بيانات المختبر</div>
+        <div class="student-fields-grid">
+          <div class="field-group">
+            <label for="studentName">اسم المختبر (ثلاثياً على الأقل):</label>
+            <input type="text" id="studentName" placeholder="مثال: أحمد محمد عبدالله">
+          </div>
+          <div class="field-group">
+            <label for="studentId">رقم الهوية / رقم الطالب:</label>
+            <input type="text" id="studentId" placeholder="مثال: 1234567890">
+          </div>
+        </div>
+        <div class="center mt-15">
+          <button class="btn btn-primary" id="startExamBtn">بدء القسم الأول</button>
+        </div>
+        <div class="start-hint">
+          عند الضغط على زر "بدء القسم الأول" يبدأ زمن القسم الأول (15 دقيقة) ويظهر لك السؤال الأول مباشرة.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- شاشة الاختبار (القسم الحالي) -->
+  <section id="examView" class="hidden">
+    <div class="card">
+      <div class="exam-frame">
+        <!-- Sidebar -->
+        <aside class="exam-sidebar">
+          <div class="sidebar-box">
+            <div class="sidebar-label">الوقت المتبقي</div>
+            <div class="timer-display" id="timerLabel">15:00</div>
+            <div class="section-indicator" id="sectionIndicator"></div>
+          </div>
+          <div class="sidebar-box">
+            <div class="sidebar-label">حالة الأسئلة في هذا القسم</div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color legend-unanswered"></div> غير مجاب
+              </div>
+              <div class="legend-item">
+                <div class="legend-color legend-answered"></div> مُجاب
+              </div>
+              <div class="legend-item">
+                <div class="legend-color legend-review"></div> للمراجعة
+              </div>
+            </div>
+            <div class="questions-grid" id="questionsGrid"></div>
+          </div>
+          <button class="btn btn-secondary sidebar-bottom-btn" id="reviewSectionBtn">مراجعة القسم</button>
+        </aside>
+
+        <!-- Main -->
+        <section class="exam-main">
+          <div class="exam-header-row">
+            <div class="section-title-label" id="sectionTitleLabel"></div>
+            <div id="progressLabel"></div>
+          </div>
+          <div class="exam-header-row" style="margin-top:4px;">
+            <div class="question-num-label" id="questionNumberLabel"></div>
+            <div id="questionTypeLabel"></div>
+          </div>
+          <div class="question-box" id="questionText"></div>
+          <ul class="options-list" id="optionsList"></ul>
+
+          <div class="exam-footer">
+            <div class="exam-footer-left">
+              <button class="nav-btn" id="prevBtn">السابق</button>
+              <button class="nav-btn" id="nextBtn">التالي</button>
+            </div>
+            <div class="exam-footer-right">
+              <button class="review-toggle" id="toggleReviewBtn">وضع علامة للمراجعة</button>
+              <button class="finish-section-btn" id="finishSectionBtn">إنهاء القسم</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- شاشة مراجعة القسم -->
+  <section id="reviewView" class="card hidden">
+    <h2 class="card-title">مراجعة القسم قبل الإنهاء</h2>
+    <p class="small-text" id="reviewInfoText">
+      يمكنك الانتقال لأي سؤال في هذا القسم والتحقق من حالته قبل الإنهاء النهائي.
+    </p>
+    <table class="review-table">
+      <thead>
+        <tr>
+          <th>رقم السؤال</th>
+          <th>نوع السؤال</th>
+          <th>الحالة</th>
+          <th>انتقال</th>
+        </tr>
+      </thead>
+      <tbody id="reviewTableBody"></tbody>
+    </table>
+    <div class="center mt-15">
+      <button class="btn btn-secondary" id="backToExamBtn">العودة للأسئلة</button>
+      <button class="btn btn-danger" id="confirmFinishBtn" style="margin-right:8px;">تأكيد إنهاء هذا القسم</button>
+    </div>
+  </section>
+
+  <!-- شاشة رسالة الطالب بعد انتهاء جميع الأقسام -->
+  <section id="endStudentView" class="card hidden">
+    <h2 class="card-title">تم إنهاء جميع أقسام الاختبار</h2>
+    <p class="small-text">
+      تم تسجيل إجاباتك في النظام التجريبي بنجاح.<br>
+      سيتم الاطلاع على نتائجك من قبل المعلم / المراقب عبر صفحة المعلم.
+    </p>
+    <div class="center mt-15">
+      <button class="btn btn-secondary" id="endBackBtn">إنهاء</button>
+    </div>
+  </section>
+
+  <!-- شاشة المعلم -->
+  <section id="teacherView" class="card hidden">
+    <h2 class="card-title">صفحة المعلم - سجلات الطلاب</h2>
+    <p class="small-text">
+      يتم حفظ السجلات في هذا المتصفح فقط (localStorage).<br>
+      كلمة مرور الدخول: <strong>121212</strong> كما تم ضبطها في الكود.
+    </p>
+    <div id="teacherTableWrapper"></div>
+    <div class="center mt-15">
+      <button class="btn btn-danger" id="clearResultsBtn">مسح جميع السجلات</button>
+      <button class="btn btn-secondary" id="backFromTeacherBtn" style="margin-right:8px;">عودة</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// ============================
+// بيانات الأقسام والأسئلة
+// كل قسم: 14 سؤال (7 كمي + 7 لفظي)
+// ============================
+const EXAM_SECTIONS = [
+  {
+    id: 1,
+    title: "القسم الأول",
+    questions: [
+      // كمي
+      { type: "كمي", text: "إذا كان 3س + 9 = 0، فما قيمة س؟", options: ["-3", "3", "-9", "9"], correctIndex: 0 },
+      { type: "كمي", text: "متوسط ثلاثة أعداد هو 8، فإذا كان مجموع عددين منها 15، فما العدد الثالث؟", options: ["7", "8", "9", "10"], correctIndex: 0 },
+      { type: "كمي", text: "نسبة الطلاب إلى الطالبات 4 : 3، إذا كان عدد الطالبات 27، فكم عدد الطلاب؟", options: ["30", "32", "34", "36"], correctIndex: 3 },
+      { type: "كمي", text: "اشترى تاجر سلعة بـ 200 ريال وباعها بربح 15٪، فما سعر البيع؟", options: ["210", "220", "230", "240"], correctIndex: 1 },
+      { type: "كمي", text: "سيارة سرعتها 80 كم/ساعة، كم تقطع في 2.5 ساعة؟", options: ["160", "180", "190", "200"], correctIndex: 1 },
+      { type: "كمي", text: "إذا كان محيط مستطيل 30 سم وطوله 10 سم، فما عرضه؟", options: ["3", "4", "5", "6"], correctIndex: 1 },
+      { type: "كمي", text: "وعاء يحتوي على 5 كرات حمراء و3 زرقاء، ما احتمال سحب كرة زرقاء؟", options: ["3/5", "3/8", "5/8", "1/2"], correctIndex: 1 },
+      // لفظي
+      { type: "لفظي", text: "قلم : كتابة", options: ["فرشاة : رسم", "باب : نافذة", "كتاب : ورق", "مطر : سحابة"], correctIndex: 0 },
+      { type: "لفظي", text: "ليل : نهار", options: ["سماء : أرض", "صيف : شتاء", "قلم : ورقة", "رمل : صحراء"], correctIndex: 1 },
+      { type: "لفظي", text: "طبيب : مريض", options: ["معلم : طالب", "مهندس : مكتب", "شرطي : مخالفة", "كاتب : صحيفة"], correctIndex: 0 },
+      { type: "لفظي", text: "العلم ___ يرفع مكانة صاحبه.", options: ["نادراً", "أحياناً", "دائماً", "قليلاً"], correctIndex: 2 },
+      { type: "لفظي", text: "من جدَّ ___ .", options: ["وجد", "نام", "لعب", "ترك"], correctIndex: 0 },
+      { type: "لفظي", text: "الوقت كالسيف إن لم تقطعه ___ .", options: ["ضاع", "سبقك", "غاب", "قطعك"], correctIndex: 3 },
+      { type: "لفظي", text: "التعاون بين أفراد المجتمع يؤدي إلى ___ .", options: ["الضعف", "القوة", "الفوضى", "التراجع"], correctIndex: 1 }
+    ]
+  },
+  {
+    id: 2,
+    title: "القسم الثاني",
+    questions: [
+      // كمي
+      { type: "كمي", text: "إذا كان 5س - 10 = 0، فما س؟", options: ["1", "2", "3", "4"], correctIndex: 1 },
+      { type: "كمي", text: "مجموع عددين 30 وفرقُهما 6، فما العددان؟", options: ["18 و12", "20 و10", "17 و13", "19 و11"], correctIndex: 0 },
+      { type: "كمي", text: "نسبة النجاح في فصل ما هي 80٪، فإذا كان عدد الطلاب 40، فكم عدد الناجحين؟", options: ["30", "32", "34", "36"], correctIndex: 1 },
+      { type: "كمي", text: "إذا زاد العدد 150 بنسبة 10٪، فما الناتج؟", options: ["155", "160", "165", "170"], correctIndex: 2 },
+      { type: "كمي", text: "طول مستطيل 9 سم وعرضه 4 سم، فما مساحته؟", options: ["13", "20", "32", "36"], correctIndex: 3 },
+      { type: "كمي", text: "إذا كان محيط مربع 24 سم، فما طول ضلعه؟", options: ["4", "5", "6", "8"], correctIndex: 2 },
+      { type: "كمي", text: "وعاء فيه 7 كرات حمراء و3 صفراء، ما احتمال سحب كرة حمراء؟", options: ["3/10", "7/10", "1/2", "2/3"], correctIndex: 1 },
+      // لفظي
+      { type: "لفظي", text: "كتاب : قراءة", options: ["طعام : جوع", "مفتاح : باب", "سيارة : طريق", "هاتف : رسالة"], correctIndex: 0 },
+      { type: "لفظي", text: "عين : نظر", options: ["لسان : تذوق", "يد : سماع", "أنف : كلام", "قدم : رؤية"], correctIndex: 0 },
+      { type: "لفظي", text: "طالب مجتهد هو الذي ___ دروسه أولاً بأول.", options: ["يهمل", "ينسى", "يراجع", "يؤجل"], correctIndex: 2 },
+      { type: "لفظي", text: "القراءة هي مفتاح ___ .", options: ["الضياع", "العلم", "النوم", "اللعب"], correctIndex: 1 },
+      { type: "لفظي", text: "لا يبلغ المجد من ينال الراحة، بل من ___ .", options: ["يرتاح كثيراً", "يصبر ويتعب", "يترك العمل", "يتردد"], correctIndex: 1 },
+      { type: "لفظي", text: "الصديق وقت ___ .", options: ["الفراغ", "اللعب", "الضيق", "السفر"], correctIndex: 2 },
+      { type: "لفظي", text: "التخطيط الجيد يساعد على ___ الأهداف.", options: ["إضاعة", "بلوغ", "نسيان", "تعطيل"], correctIndex: 1 }
+    ]
+  },
+  {
+    id: 3,
+    title: "القسم الثالث",
+    questions: [
+      // كمي
+      { type: "كمي", text: "إذا كان 2س + 6 = 18، فما قيمة س؟", options: ["4", "5", "6", "7"], correctIndex: 1 },
+      { type: "كمي", text: "اشترى شخص 3 دفاتر كل واحد بـ 8 ريالات، كم دفع؟", options: ["16", "20", "22", "24"], correctIndex: 3 },
+      { type: "كمي", text: "مجموع خمس سنوات متتالية هو 75، فما متوسطها؟", options: ["13", "14", "15", "16"], correctIndex: 2 },
+      { type: "كمي", text: "سعر ساعة 120 ريالاً بعد خصم 20٪، فما السعر قبل الخصم؟", options: ["130", "140", "150", "160"], correctIndex: 2 },
+      { type: "كمي", text: "صندوق فيه 4 كرات حمراء و6 خضراء، ما احتمال سحب كرة خضراء؟", options: ["2/5", "3/5", "1/2", "4/5"], correctIndex: 1 },
+      { type: "كمي", text: "إذا كان طول الحديقة 10 م وعرضها 5 م، فما مساحتها؟", options: ["15", "30", "40", "50"], correctIndex: 3 },
+      { type: "كمي", text: "عدد مربعات الشكل 4×4 يساوي:", options: ["8", "12", "16", "24"], correctIndex: 2 },
+      // لفظي
+      { type: "لفظي", text: "قلب : جسد", options: ["محرّك : سيارة", "باب : نافذة", "قلم : دفتر", "بحر : سفينة"], correctIndex: 0 },
+      { type: "لفظي", text: "بحر : ملح", options: ["صحراء : رمل", "سماء : طير", "قمر : ضوء", "شمس : غيم"], correctIndex: 0 },
+      { type: "لفظي", text: "العدل أساس ___ .", options: ["الظلم", "الفوضى", "الحكم", "الضعف"], correctIndex: 2 },
+      { type: "لفظي", text: "من تواضع ___ .", options: ["خسر", "رُفع", "سقط", "تأخر"], correctIndex: 1 },
+      { type: "لفظي", text: "الصدق ينجي صاحبه من ___ .", options: ["الوقوع في الخطأ", "المتاعب", "ثقة الناس", "المشاكل"], correctIndex: 3 },
+      { type: "لفظي", text: "الطالب الذي يحضر مبكرًا غالبًا ما يكون ___ .", options: ["مهملًا", "جادًا", "غافلاً", "متردداً"], correctIndex: 1 },
+      { type: "لفظي", text: "العلم مع العمل يؤدي إلى ___ .", options: ["الجهل", "التراجع", "التقدم", "النسيان"], correctIndex: 2 }
+    ]
+  }
+];
+
+// مدة كل قسم بالدقائق
+const SECTION_DURATION_MINUTES = 15;
+// كلمة مرور صفحة المعلم
+const TEACHER_PASSWORD = "121212";
+
+// ============================
+// حالة الاختبار
+// ============================
+let currentSectionIndex = 0;
+let currentQuestionIndex = 0;
+let studentName = "";
+let studentId = "";
+let remainingSeconds = 0;
+let timerInterval = null;
+let examFinished = false;
+let currentSectionLocked = false; // القسم انتهى مبكراً وينتظر انتهاء الوقت
+
+// إجابات وعلامات مراجعة لكل قسم
+let answers = EXAM_SECTIONS.map(sec => new Array(sec.questions.length).fill(null));
+let reviewFlags = EXAM_SECTIONS.map(sec => new Array(sec.questions.length).fill(false));
+
+// ============================
+// عناصر DOM
+// ============================
+const introView = document.getElementById("introView");
+const examView = document.getElementById("examView");
+const reviewView = document.getElementById("reviewView");
+const endStudentView = document.getElementById("endStudentView");
+const teacherView = document.getElementById("teacherView");
+
+const timerLabelEl = document.getElementById("timerLabel");
+const sectionIndicatorEl = document.getElementById("sectionIndicator");
+const sectionTitleLabelEl = document.getElementById("sectionTitleLabel");
+const questionsGridEl = document.getElementById("questionsGrid");
+const questionTextEl = document.getElementById("questionText");
+const optionsListEl = document.getElementById("optionsList");
+const progressLabelEl = document.getElementById("progressLabel");
+const questionNumberLabelEl = document.getElementById("questionNumberLabel");
+const questionTypeLabelEl = document.getElementById("questionTypeLabel");
+const toggleReviewBtn = document.getElementById("toggleReviewBtn");
+const reviewTableBody = document.getElementById("reviewTableBody");
+const teacherTableWrapper = document.getElementById("teacherTableWrapper");
+const reviewInfoText = document.getElementById("reviewInfoText");
+const backToExamBtn = document.getElementById("backToExamBtn");
+const confirmFinishBtn = document.getElementById("confirmFinishBtn");
+
+// ============================
+// دوال مساعدة
+// ============================
+function showOnly(viewId) {
+  introView.classList.add("hidden");
+  examView.classList.add("hidden");
+  reviewView.classList.add("hidden");
+  endStudentView.classList.add("hidden");
+  teacherView.classList.add("hidden");
+
+  document.getElementById(viewId).classList.remove("hidden");
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+function updateTimerLabel() {
+  timerLabelEl.textContent = formatTime(remainingSeconds);
+}
+
+function initQuestionsGridForSection() {
+  questionsGridEl.innerHTML = "";
+  const sec = EXAM_SECTIONS[currentSectionIndex];
+  sec.questions.forEach((q, idx) => {
+    const cell = document.createElement("div");
+    cell.className = "q-cell";
+    cell.textContent = idx + 1;
+    cell.dataset.index = idx;
+    cell.addEventListener("click", () => {
+      if (examFinished || currentSectionLocked) return;
+      currentQuestionIndex = idx;
+      renderQuestion();
+      refreshQuestionsGridStatus();
+    });
+    questionsGridEl.appendChild(cell);
+  });
+  refreshQuestionsGridStatus();
+}
+
+function refreshQuestionsGridStatus() {
+  const cells = questionsGridEl.querySelectorAll(".q-cell");
+  const secAnswers = answers[currentSectionIndex];
+  const secReviews = reviewFlags[currentSectionIndex];
+  cells.forEach(cell => {
+    const idx = parseInt(cell.dataset.index, 10);
+    cell.classList.remove("answered", "review", "active");
+    if (secAnswers[idx] !== null && secAnswers[idx] !== undefined) {
+      cell.classList.add("answered");
+    }
+    if (secReviews[idx]) {
+      cell.classList.add("review");
+    }
+    if (idx === currentQuestionIndex) {
+      cell.classList.add("active");
+    }
+  });
+}
+
+function renderQuestion() {
+  const sec = EXAM_SECTIONS[currentSectionIndex];
+  const q = sec.questions[currentQuestionIndex];
+  const secAnswers = answers[currentSectionIndex];
+  const secReviews = reviewFlags[currentSectionIndex];
+
+  sectionTitleLabelEl.textContent = sec.title;
+  sectionIndicatorEl.textContent = `القسم ${currentSectionIndex + 1} من ${EXAM_SECTIONS.length}`;
+
+  progressLabelEl.textContent = `السؤال ${currentQuestionIndex + 1} من ${sec.questions.length}`;
+  questionNumberLabelEl.textContent = `س${currentQuestionIndex + 1}`;
+  questionTypeLabelEl.textContent = `نوع السؤال: ${q.type}`;
+  questionTextEl.textContent = q.text;
+
+  optionsListEl.innerHTML = "";
+  const selected = secAnswers[currentQuestionIndex];
+  const letterMap = ["أ", "ب", "ج", "د"];
+  q.options.forEach((opt, idx) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.textContent = `(${letterMap[idx]}) ${opt}`;
+    if (selected === idx) {
+      btn.classList.add("selected");
+    }
+    btn.addEventListener("click", () => {
+      if (examFinished || currentSectionLocked) return;
+      secAnswers[currentQuestionIndex] = idx;
+      renderQuestion();
+      refreshQuestionsGridStatus();
+    });
+    li.appendChild(btn);
+    optionsListEl.appendChild(li);
+  });
+
+  // زر المراجعة
+  if (secReviews[currentQuestionIndex]) {
+    toggleReviewBtn.classList.add("active");
+    toggleReviewBtn.textContent = "إزالة علامة المراجعة";
+  } else {
+    toggleReviewBtn.classList.remove("active");
+    toggleReviewBtn.textContent = "وضع علامة للمراجعة";
+  }
+
+  // أزرار السابق / التالي
+  document.getElementById("prevBtn").disabled = currentQuestionIndex === 0 || currentSectionLocked;
+  document.getElementById("nextBtn").disabled = currentQuestionIndex === sec.questions.length - 1 || currentSectionLocked;
+  toggleReviewBtn.disabled = currentSectionLocked;
+}
+
+function startSection(index) {
+  currentSectionIndex = index;
+  currentQuestionIndex = 0;
+  currentSectionLocked = false;
+
+  // إعادة ضبط نص شاشة المراجعة والأزرار
+  reviewInfoText.textContent = "يمكنك الانتقال لأي سؤال في هذا القسم والتحقق من حالته قبل الإنهاء النهائي.";
+  backToExamBtn.disabled = false;
+  backToExamBtn.style.opacity = "1";
+  confirmFinishBtn.disabled = false;
+  confirmFinishBtn.style.opacity = "1";
+  confirmFinishBtn.textContent = "تأكيد إنهاء هذا القسم";
+
+  const sec = EXAM_SECTIONS[currentSectionIndex];
+
+  // ضبط المؤقت
+  remainingSeconds = SECTION_DURATION_MINUTES * 60;
+  updateTimerLabel();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    remainingSeconds--;
+    updateTimerLabel();
+    if (remainingSeconds <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      alert("انتهى وقت هذا القسم. سيتم الانتقال تلقائياً إلى القسم التالي (إن وجد).");
+      autoFinishCurrentSection();
+    }
+  }, 1000);
+
+  initQuestionsGridForSection();
+  renderQuestion();
+  showOnly("examView");
+}
+
+function autoFinishCurrentSection() {
+  if (currentSectionIndex < EXAM_SECTIONS.length - 1) {
+    startSection(currentSectionIndex + 1);
+  } else {
+    finishExamAndStore();
+  }
+}
+
+// مراجعة القسم
+function buildReviewTableForCurrentSection() {
+  reviewTableBody.innerHTML = "";
+  const sec = EXAM_SECTIONS[currentSectionIndex];
+  const secAnswers = answers[currentSectionIndex];
+  const secReviews = reviewFlags[currentSectionIndex];
+
+  sec.questions.forEach((q, idx) => {
+    const tr = document.createElement("tr");
+
+    const tdNum = document.createElement("td");
+    tdNum.textContent = idx + 1;
+    tr.appendChild(tdNum);
+
+    const tdType = document.createElement("td");
+    tdType.textContent = q.type;
+    tr.appendChild(tdType);
+
+    const tdStatus = document.createElement("td");
+    let badgeClass = "";
+    let statusText = "";
+    if (secReviews[idx]) {
+      badgeClass = "badge badge-review";
+      statusText = "للمراجعة";
+    } else if (secAnswers[idx] === null || secAnswers[idx] === undefined) {
+      badgeClass = "badge badge-unanswered";
+      statusText = "غير مجاب";
+    } else {
+      badgeClass = "badge badge-answered";
+      statusText = "مجاب";
+    }
+    const span = document.createElement("span");
+    span.className = badgeClass;
+    span.textContent = statusText;
+    tdStatus.appendChild(span);
+    tr.appendChild(tdStatus);
+
+    const tdGo = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.className = "btn btn-secondary";
+    btn.style.fontSize = "11px";
+    btn.textContent = "انتقال";
+    if (currentSectionLocked) {
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+    } else {
+      btn.addEventListener("click", () => {
+        showOnly("examView");
+        currentQuestionIndex = idx;
+        renderQuestion();
+        refreshQuestionsGridStatus();
+      });
+    }
+    tdGo.appendChild(btn);
+    tr.appendChild(tdGo);
+
+    reviewTableBody.appendChild(tr);
+  });
+}
+
+// انتهاء كامل الاختبار
+function finishExamAndStore() {
+  if (examFinished) return;
+  examFinished = true;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  let totalQuestions = 0;
+  let totalCorrect = 0;
+
+  EXAM_SECTIONS.forEach((sec, secIdx) => {
+    sec.questions.forEach((q, qIdx) => {
+      totalQuestions++;
+      if (answers[secIdx][qIdx] === q.correctIndex) {
+        totalCorrect++;
+      }
+    });
+  });
+
+  const percent = Math.round((totalCorrect / totalQuestions) * 100);
+
+  const record = {
+    id: Date.now(),
+    studentName,
+    studentId,
+    dateTime: new Date().toLocaleString("ar-SA"),
+    totalQuestions,
+    totalCorrect,
+    percent
+  };
+
+  let stored = [];
+  try {
+    stored = JSON.parse(localStorage.getItem("multiSectionQiyasMock") || "[]");
+    if (!Array.isArray(stored)) stored = [];
+  } catch (e) {
+    stored = [];
+  }
+  stored.push(record);
+  localStorage.setItem("multiSectionQiyasMock", JSON.stringify(stored));
+
+  showOnly("endStudentView");
+}
+
+// تحميل جدول المعلم
+function loadTeacherTable() {
+  let stored = [];
+  try {
+    stored = JSON.parse(localStorage.getItem("multiSectionQiyasMock") || "[]");
+    if (!Array.isArray(stored)) stored = [];
+  } catch (e) {
+    stored = [];
+  }
+
+  if (!stored.length) {
+    teacherTableWrapper.innerHTML = "<p class='small-text'>لا توجد سجلات محفوظة حتى الآن.</p>";
+    return;
+  }
+
+  let html = "<table class='teacher-table'><thead><tr><th>#</th><th>اسم الطالب</th><th>الرقم</th><th>التاريخ والوقت</th><th>الدرجة</th><th>النسبة</th></tr></thead><tbody>";
+  stored.forEach((r, idx) => {
+    html += `<tr>
+      <td>${idx + 1}</td>
+      <td>${r.studentName || "-"}</td>
+      <td>${r.studentId || "-"}</td>
+      <td>${r.dateTime}</td>
+      <td>${r.totalCorrect} / ${r.totalQuestions}</td>
+      <td>${r.percent}٪</td>
+    </tr>`;
+  });
+  html += "</tbody></table>";
+  teacherTableWrapper.innerHTML = html;
+}
+
+// ============================
+// الأحداث
+// ============================
+document.getElementById("startExamBtn").addEventListener("click", () => {
+  const name = (document.getElementById("studentName").value || "").trim();
+  const id = (document.getElementById("studentId").value || "").trim();
+  if (!name || !id) {
+    alert("الرجاء إدخال اسم المختبر ورقم الطالب قبل البدء.");
+    return;
+  }
+  studentName = name;
+  studentId = id;
+
+  // إعادة تهيئة
+  answers = EXAM_SECTIONS.map(sec => new Array(sec.questions.length).fill(null));
+  reviewFlags = EXAM_SECTIONS.map(sec => new Array(sec.questions.length).fill(false));
+  examFinished = false;
+  startSection(0);
+});
+
+document.getElementById("prevBtn").addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    renderQuestion();
+    refreshQuestionsGridStatus();
+  }
+});
+
+document.getElementById("nextBtn").addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  const sec = EXAM_SECTIONS[currentSectionIndex];
+  if (currentQuestionIndex < sec.questions.length - 1) {
+    currentQuestionIndex++;
+    renderQuestion();
+    refreshQuestionsGridStatus();
+  }
+});
+
+toggleReviewBtn.addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  const flags = reviewFlags[currentSectionIndex];
+  flags[currentQuestionIndex] = !flags[currentQuestionIndex];
+  renderQuestion();
+  refreshQuestionsGridStatus();
+});
+
+document.getElementById("finishSectionBtn").addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  const ok = confirm("سيتم الانتقال إلى شاشة مراجعة هذا القسم، ويمكنك من هناك تأكيد إنهائه. هل تريد المتابعة؟");
+  if (!ok) return;
+  buildReviewTableForCurrentSection();
+  showOnly("reviewView");
+});
+
+backToExamBtn.addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  showOnly("examView");
+  renderQuestion();
+  refreshQuestionsGridStatus();
+});
+
+confirmFinishBtn.addEventListener("click", () => {
+  if (examFinished || currentSectionLocked) return;
+  const ok = confirm("هل أنت متأكد من إنهاء هذا القسم نهائياً؟ لن تتمكن من تعديل إجاباتك، لكن سيستمر الوقت حتى نهايته.");
+  if (!ok) return;
+  currentSectionLocked = true;
+
+  // تحديث نص التعليمات
+  reviewInfoText.textContent = "تم إنهاء هذا القسم. يرجى الانتظار حتى انتهاء الوقت للانتقال إلى القسم التالي.";
+
+  // تعطيل الأزرار
+  backToExamBtn.disabled = true;
+  backToExamBtn.style.opacity = "0.5";
+  confirmFinishBtn.disabled = true;
+  confirmFinishBtn.style.opacity = "0.5";
+  confirmFinishBtn.textContent = "تم إنهاء القسم - بانتظار انتهاء الوقت";
+
+  // تعطيل أزرار الانتقال في جدول المراجعة
+  const goButtons = reviewTableBody.querySelectorAll("button");
+  goButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
+  });
+});
+
+document.getElementById("endBackBtn").addEventListener("click", () => {
+  showOnly("introView");
+});
+
+// زر المعلم
+document.getElementById("teacherBtn").addEventListener("click", () => {
+  const code = prompt("أدخل كلمة مرور صفحة المعلم:");
+  if (code === null) return;
+  if (code !== TEACHER_PASSWORD) {
+    alert("كلمة المرور غير صحيحة.");
+    return;
+  }
+  loadTeacherTable();
+  showOnly("teacherView");
+});
+
+// صفحة المعلم
+document.getElementById("clearResultsBtn").addEventListener("click", () => {
+  const ok = confirm("سيتم مسح جميع السجلات من هذا المتصفح. هل أنت متأكد؟");
+  if (!ok) return;
+  localStorage.removeItem("multiSectionQiyasMock");
+  loadTeacherTable();
+});
+
+document.getElementById("backFromTeacherBtn").addEventListener("click", () => {
+  if (examFinished) {
+    showOnly("endStudentView");
+  } else {
+    showOnly("introView");
+  }
+});
+
+// في البداية
+showOnly("introView");
+</script>
+</body>
+</html>
